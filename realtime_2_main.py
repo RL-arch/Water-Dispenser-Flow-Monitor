@@ -48,8 +48,7 @@ class QtPanningPlot:
 
     def addData(self, d):
         self.data.append(d)
-#do filter here-----------------------------------------
-myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter')
+
 
 # Let's create two instances of plot windows
 qtPanningPlot1 = QtPanningPlot("Arduino 1st channel")
@@ -58,7 +57,8 @@ qtPanningPlot2 = QtPanningPlot("Arduino 2nd channel")
 # sampling rate: 100Hz
 samplingRate = 100
 
-
+#do filter here-----------------------------------------
+myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter')
 # called for every new sample at channel 0 which has arrived from the Arduino
 # "data" contains the new sample
 def callBack(data):
@@ -66,11 +66,11 @@ def callBack(data):
     # data = self.filter_of_channel0.dofilter(data)
     # send the sample to the plotwindow
     qtPanningPlot1.addData(data)
-    ch1 = board.analog[1].read()
+    ch1 = board.analog[0].read()
     # 1st sample of 2nd channel might arrive later so need to check
     if ch1:
         # filter your channel 1 samples here:
-        ch1 = myFilter.filter(ch1)
+        ch1 = myFilter.doFilter(ch1)
         qtPanningPlot2.addData(ch1)
 
 

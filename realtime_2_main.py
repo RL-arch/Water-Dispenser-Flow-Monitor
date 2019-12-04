@@ -1,16 +1,18 @@
 #!/usr/bin/python3
 """
 Plots channels zero and one in two different windows. Requires pyqtgraph.
+Read sensor -> Filter -> Plot
 """
 
 import sys
-
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-
 import numpy as np
-
+import scipy.signal as sig
 from pyfirmata2 import Arduino
+from scipy import integrate
+import iir_filter_complete
+import multiprocessing
 
 PORT = Arduino.AUTODETECT
 
@@ -31,6 +33,7 @@ class QtPanningPlot:
         self.plt.setXRange(0, 500)
         self.curve = self.plt.plot()
         self.data = []
+        # any additional initalisation code goes here (filters etc)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
         self.timer.start(100)
@@ -45,7 +48,8 @@ class QtPanningPlot:
 
     def addData(self, d):
         self.data.append(d)
-
+#do filter here-----------------------------------------
+myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter')
 
 # Let's create two instances of plot windows
 qtPanningPlot1 = QtPanningPlot("Arduino 1st channel")
@@ -55,13 +59,18 @@ qtPanningPlot2 = QtPanningPlot("Arduino 2nd channel")
 samplingRate = 100
 
 
-# called for every new sample which has arrived from the Arduino
+# called for every new sample at channel 0 which has arrived from the Arduino
+# "data" contains the new sample
 def callBack(data):
+    # filter your channel 0 samples here:
+    # data = self.filter_of_channel0.dofilter(data)
     # send the sample to the plotwindow
     qtPanningPlot1.addData(data)
     ch1 = board.analog[1].read()
     # 1st sample of 2nd channel might arrive later so need to check
     if ch1:
+        # filter your channel 1 samples here:
+        ch1 = myFilter.filter(ch1)
         qtPanningPlot2.addData(ch1)
 
 
@@ -72,6 +81,8 @@ board = Arduino(PORT)
 board.samplingOn(1000 / samplingRate)
 
 # Register the callback which adds the data to the animated plot
+# The function "callback" (see above) is called when data has
+# arrived on channel 0.
 board.analog[0].register_callback(callBack)
 
 # Enable the callback

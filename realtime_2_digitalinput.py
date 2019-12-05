@@ -59,8 +59,6 @@ samplingRate = 100
 
 #do filter here-----------------------------------------
 myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter')
-
-
 # called for every new sample at channel 0 which has arrived from the Arduino
 # "data" contains the new sample
 def callBack(data):
@@ -68,7 +66,7 @@ def callBack(data):
     # data = self.filter_of_channel0.dofilter(data)
     # send the sample to the plotwindow
     qtPanningPlot1.addData(data)
-    ch1 = digital_0.read()
+    ch1 = board.analog[0].read()
     # 1st sample of 2nd channel might arrive later so need to check
     if ch1:
         # filter your channel 1 samples here:
@@ -85,12 +83,12 @@ board.samplingOn(1000 / samplingRate)
 # Register the callback which adds the data to the animated plot
 # The function "callback" (see above) is called when data has
 # arrived on channel 0.
-#board.analog[0].register_callback(callBack)
-digital_0 = board.get_pin('d:7:i')
+board.analog[0].register_callback(callBack)
+
 # Enable the callback
-#board.analog[0].enable_reporting()
-#board.analog[1].enable_reporting()
-digital_0.enable_reporting()
+board.analog[0].enable_reporting()
+board.analog[1].enable_reporting()
+
 # showing all the windows
 app.exec_()
 

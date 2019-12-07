@@ -1,6 +1,6 @@
-#coding: Ronald B Liu 06.12.2019
+'''coding:Ronald B Liu'''
 ##IDE PyCharm Ubuntu 18.04
-#Water Flow Monitor: speed dispaly and volume calculation 
+#Water Flow Monitor: speed dispaly and volume calculation
 """
 Plots channels zero and one in two different windows. Requires pyqtgraph.
 Read sensor -> Filter -> Plot
@@ -10,11 +10,9 @@ import sys
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
-import scipy.signal as sig
 from pyfirmata2 import Arduino
 import iir_filter_complete
-import multiprocessing
-import pandas as pd
+
 
 PORT = Arduino.AUTODETECT
 
@@ -76,9 +74,11 @@ def callBack(data):
         ch1 = myFilter.doFilter(ch1)
         qtPanningPlot2.addData(ch1)
         global count
-        if (ch1>threshold):
+        if (ch1 > threshold):
+            #calculate it by experience value 1.79?
             count += 1
-        print('Total mL ',count)
+        #if count += 1, count -14 to estimate the start up 
+        print('Total mL ',count - 14)
 
         if count > 500:
             print('Stop!Halt!Bitte sparen Sie Ressourcen!')

@@ -1,4 +1,4 @@
-'''coding:Ronald B Liu'''
+#coding:Ronald B Liu
 ##IDE PyCharm Ubuntu 18.04
 #Water Flow Monitor: speed dispaly and volume calculation
 """

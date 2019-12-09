@@ -1,7 +1,40 @@
 import scipy.signal as signal
 import numpy as np
 
+class IIR2Filter(object):
+   
+    def __init__(self, mycoeff):
+        self.coefficients = mycoeff
+        self.acc_input = 0
+        self.acc_output = 0
+        self.buffer1 = 0
+        self.buffer2 = 0
+        self.input = 0
+        self.output = 0
 
+    def filter(self, input):
+        
+        self.input = input
+        self.output = 0
+        self.FIRcoeff = self.coefficients[0:3]
+        self.IIRcoeff = self.coefficients[3:6]
+
+       
+        self.acc_input = (self.input + self.buffer1
+                             * -self.IIRcoeff[1] + self.buffer2 * -self.IIRcoeff[2])
+
+        self.acc_output = (self.acc_input * self.FIRcoeff[0]
+                              + self.buffer1 * self.FIRcoeff[1] + self.buffer2
+                              * self.FIRcoeff[2])
+
+        # Shifting the values on the delay line: acc_input->buffer1->buffer2
+        self.buffer2 = self.buffer1
+        self.buffer1 = self.acc_input
+        self.input = self.acc_output
+        self.output = self.acc_output
+        return self.output
+    
+    
 class IIR(object):
     """
     At the instantiation of the filter the following parameters are compulsory:

@@ -2,8 +2,12 @@
 ##IDE PyCharm Ubuntu 18.04
 #Water Flow Monitor: speed dispaly and volume calculation
 """
+In a well-lighting environment, connect the arduino, load example standard firmata 
+run the code 
 Plots channels zero and one in two different windows. Requires pyqtgraph.
 Read sensor -> Filter -> Plot
+The plots show the speed of water (before and after filter)
+The dialog show the volume of water, when the warning appears, stop catching water
 """
 
 import sys
@@ -58,7 +62,7 @@ qtPanningPlot2 = QtPanningPlot("Arduino 2nd channel")
 samplingRate = 100
 count: int = 0
 #do filter here-----------------------------------------
-myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter')
+myFilter = iir_filter_complete.IIR(2, [1, 8], 'bandpass', design='butter', fs=100)
 # called for every new sample at channel 0 which has arrived from the Arduino
 # "data" contains the new sample
 def callBack(data):
@@ -73,15 +77,20 @@ def callBack(data):
         # filter your channel 1 samples here:
         ch1 = myFilter.doFilter(ch1)
         qtPanningPlot2.addData(ch1)
-        global count
+        global count, init
         if (ch1 > threshold):
-            #calculate it by experience value 1.79?
+            # SET: when the sensor roters once, the volume of the water, calculate it by experience value
+            # 1.79?
             count += 1
-        #if count += 1, count -14 to estimate the start up 
-        print('Total mL ',count - 14)
-
-        if count > 500:
-            print('Stop!Halt!Bitte sparen Sie Ressourcen!')
+            # SET the initial value depends on the lighting conditions
+            init = 11
+            #if count += 1, count -14 to estimate the start up
+        #make sure before the detection, Total mL = 0
+        print('Total mL ',count - init)
+        #SET Container capacity (mL)
+        cap = 220
+        if count > cap:
+            print('Stop!Please save resources!')
 
 # Get the Ardunio board.
 board = Arduino(PORT)

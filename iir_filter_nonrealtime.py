@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from IIR2Filter import IIR2Filter
+from iir_filter_complete import IIR2Filter
 
 fs = 200
 FilterMains = IIR2Filter(3,[45,55],'bandstop',design='cheby1',rp=0.01,fs=200)

@@ -24,3 +24,5 @@ plt.plot(xfF,np.real(freqResponse))
 plt.xlabel("Frequency [Hz]")
 plt.ylabel("Amplitude")
 plt.title("Bandstop")
+
+plt.show()

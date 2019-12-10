@@ -69,7 +69,7 @@ def callBack(data):
     # filter your channel 0 samples here:
     # data = self.filter_of_channel0.dofilter(data)
     # send the sample to the plotwindow
-    threshold = 0.1
+    threshold = 0.03
     qtPanningPlot1.addData(data)
     ch1 = board.analog[0].read()
     # 1st sample of 2nd channel might arrive later so need to check
@@ -83,10 +83,10 @@ def callBack(data):
             # 1.79?
             count += 1
             # SET the initial value depends on the lighting conditions
-            init = 11
+            #init = 11
             #if count += 1, count -14 to estimate the start up
         #make sure before the detection, Total mL = 0
-        print('Total mL ',count - init)
+        print('Total mL ',count - 14)
         #SET Container capacity (mL)
         cap = 220
         if count > cap:
